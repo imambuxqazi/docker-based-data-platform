@@ -1,0 +1,26 @@
+FROM apache/spark:3.5.1-python3
+
+USER root
+
+ENV CONDA_DIR=/opt/conda
+ENV PYSPARK_PYTHON=${CONDA_DIR}/bin/python
+ENV PYSPARK_DRIVER_PYTHON=${CONDA_DIR}/bin/python
+ENV PATH=${CONDA_DIR}/bin:${PATH}
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        bzip2 \
+        procps && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -L -o /tmp/miniforge.sh \
+        https://github.com/conda-forge/miniforge/releases/download/24.11.3-0/Miniforge3-Linux-x86_64.sh && \
+    bash /tmp/miniforge.sh -b -p ${CONDA_DIR} && \
+    rm -f /tmp/miniforge.sh && \
+    ${CONDA_DIR}/bin/conda install -y python=3.11.9 && \
+    ${CONDA_DIR}/bin/conda clean -afy && \
+    ln -sf ${CONDA_DIR}/bin/python /usr/local/bin/python3.11 && \
+    ln -sf ${CONDA_DIR}/bin/python /usr/local/bin/python3 && \
+    ln -sf ${CONDA_DIR}/bin/python /usr/local/bin/python
